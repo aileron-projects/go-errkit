@@ -1,6 +1,6 @@
 module github.com/aileron-projects/go-errkit
 
-go 1.27rc2
+go 1.26
 
 require (
 	github.com/aileron-projects/go-tester v0.0.0-20260726193422-488e3e2d0a64
