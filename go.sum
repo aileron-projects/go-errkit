@@ -1,5 +1,5 @@
-github.com/aileron-projects/go-tester v0.0.0-20260726193422-488e3e2d0a64 h1:nQzDtQ3OyjOZTwNoYeogR58ppHqmbDC4F9Powem+QmU=
-github.com/aileron-projects/go-tester v0.0.0-20260726193422-488e3e2d0a64/go.mod h1:tYtuLZkWS1gJzPbtTSYm6Byq4BYOmv+LnBe8NPpWq4s=
+github.com/aileron-projects/go-tester v0.0.1 h1:2NKsmt6muxEZQqZH3ngKxpKWwE5dToWeEBQXH0U72cM=
+github.com/aileron-projects/go-tester v0.0.1/go.mod h1:tYtuLZkWS1gJzPbtTSYm6Byq4BYOmv+LnBe8NPpWq4s=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -9,5 +9,5 @@ github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
-github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=
-github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
+github.com/rogpeppe/go-internal v1.16.0 h1:O9DK+vNMDVGLr2BeZqmpLeMjiMNkuXfcqntWbZV6S5g=
+github.com/rogpeppe/go-internal v1.16.0/go.mod h1:DrUVZyrJU+txYW5/1kwtXQSMFio52ZOxX7yM1VHvnxs=
