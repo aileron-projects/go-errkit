@@ -15,10 +15,12 @@ var E123 = errkit.NewErrDefinition("E123", "KindXXX", "example error. foo=%s", m
 
 func instanceID() string {
 	id := rand.Uint32N(99999)
-	return fmt.Sprintf("%5d", id)
+	return fmt.Sprintf("%05d", id)
 }
 
 func main() {
+	// Instanciate an error.
+	// Environmental variable `GO_ERRKIT_TRACE_ENABLED=1` shows tracing info.
 	ins123 := E123.New(nil, "FOO")
 
 	// Println
