@@ -1,6 +1,7 @@
 package errkit_test
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -191,70 +192,84 @@ func TestErrInstance_Error(t *testing.T) {
 func TestErrInstance_Is(t *testing.T) {
 	t.Parallel()
 	testCases := map[string]struct {
-		use    *errkit.ErrInstance
+		err    error
 		target error
 		same   bool
 	}{
 		"nil": {
-			use:    nil,
+			err:    nil,
+			target: nil,
+			same:   true,
+		},
+		"nil pointer err": {
+			err:    (*errkit.ErrInstance)(nil),
 			target: nil,
 			same:   false,
 		},
-		"nil pointer": {
-			use:    nil,
+		"nil pointer target": {
+			err:    nil,
+			target: (*errkit.ErrInstance)(nil),
+			same:   false,
+		},
+		"nil pointers": {
+			err:    (*errkit.ErrInstance)(nil),
 			target: (*errkit.ErrInstance)(nil),
 			same:   true,
 		},
 		"nil target": {
-			use:    &errkit.ErrInstance{Cause: io.EOF, Code: "c", Kind: "k"},
+			err:    &errkit.ErrInstance{Code: "c", Kind: "k"},
 			target: nil,
 			same:   false,
 		},
 		"equal": {
-			use:    &errkit.ErrInstance{Code: "c", Kind: "k"},
+			err:    &errkit.ErrInstance{Code: "c", Kind: "k"},
 			target: &errkit.ErrInstance{Code: "c", Kind: "k"},
 			same:   true,
 		},
 		"not equal": {
-			use:    &errkit.ErrInstance{Cause: io.EOF, Code: "c", Kind: "k"},
+			err:    &errkit.ErrInstance{Code: "c", Kind: "k"},
 			target: io.EOF,
 			same:   false,
 		},
 		"code mismatch": {
-			use:    &errkit.ErrInstance{Code: "c", Kind: "k"},
+			err:    &errkit.ErrInstance{Code: "c", Kind: "k"},
 			target: &errkit.ErrInstance{Code: "C", Kind: "k"},
 			same:   false,
 		},
 		"kind mismatch": {
-			use:    &errkit.ErrInstance{Code: "c", Kind: "k"},
+			err:    &errkit.ErrInstance{Code: "c", Kind: "k"},
 			target: &errkit.ErrInstance{Code: "c", Kind: "K"},
 			same:   false,
 		},
 		"instance mismatch": {
-			use:    &errkit.ErrInstance{Code: "c", Kind: "k", Instance: "i"},
+			err:    &errkit.ErrInstance{Code: "c", Kind: "k", Instance: "i"},
 			target: &errkit.ErrInstance{Code: "c", Kind: "k", Instance: "I"},
 			same:   true,
 		},
 		"message mismatch": {
-			use:    &errkit.ErrInstance{Code: "c", Kind: "k", Message: "m"},
+			err:    &errkit.ErrInstance{Code: "c", Kind: "k", Message: "m"},
 			target: &errkit.ErrInstance{Code: "c", Kind: "k", Message: "M"},
 			same:   true,
 		},
 		"attrs mismatch": {
-			use:    &errkit.ErrInstance{Code: "c", Kind: "k", Attrs: map[string]string{"foo": "bar"}},
+			err:    &errkit.ErrInstance{Code: "c", Kind: "k", Attrs: map[string]string{"foo": "bar"}},
 			target: &errkit.ErrInstance{Code: "c", Kind: "k", Attrs: map[string]string{"FOO": "Bar"}},
 			same:   true,
 		},
-		"same after unwrap": {
-			use:    &errkit.ErrInstance{Code: "c", Kind: "k"},
-			target: fmt.Errorf("outer error [%w]", &errkit.ErrInstance{Code: "c", Kind: "k"}),
+		"same after unwrap error": {
+			err:    fmt.Errorf("outer error [%w]", &errkit.ErrInstance{Code: "c", Kind: "k"}),
+			target: &errkit.ErrInstance{Code: "c", Kind: "k"},
+			same:   true,
+		},
+		"same after unwrap errors": {
+			err:    fmt.Errorf("outer error [%w] [%w]", io.EOF, &errkit.ErrInstance{Code: "c", Kind: "k"}),
+			target: &errkit.ErrInstance{Code: "c", Kind: "k"},
 			same:   true,
 		},
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			is := tc.use.Is(tc.target)
-			tester.AssertEqual(t, tc.same, is)
+			tester.AssertEqual(t, tc.same, errors.Is(tc.err, tc.target))
 		})
 	}
 }

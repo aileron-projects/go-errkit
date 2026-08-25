@@ -1,7 +1,6 @@
 package errkit
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -53,16 +52,10 @@ func (e *Error) Unwrap() error {
 
 // Is returns if this error is identical to the given error.
 // This can be used with [errors.Is].
-func (e *Error) Is(err error) bool {
-	if err == nil || e == nil {
-		return e == err
-	}
-	for err != nil {
-		ee, ok := err.(*Error)
-		if ok {
-			return e.Message == ee.Message
-		}
-		err = errors.Unwrap(err)
+func (e *Error) Is(target error) bool {
+	ee, ok := target.(*Error)
+	if ok {
+		return e.Message == ee.Message
 	}
 	return false
 }

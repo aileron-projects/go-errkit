@@ -1,6 +1,7 @@
 package errkit_test
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -10,14 +11,14 @@ import (
 	"github.com/aileron-projects/go-tester"
 )
 
-func TestErr_Unwrap(t *testing.T) {
+func TestError_Unwrap(t *testing.T) {
 	t.Parallel()
 	e := &errkit.Error{Cause: io.EOF}
 	u := e.Unwrap()
 	tester.AssertEqual(t, io.EOF, u)
 }
 
-func TestErr_Error(t *testing.T) {
+func TestError_Error(t *testing.T) {
 	t.Parallel()
 	testCases := map[string]struct {
 		err  *errkit.Error
@@ -56,63 +57,87 @@ func TestErr_Error(t *testing.T) {
 	}
 }
 
-func TestErr_Is(t *testing.T) {
+func TestError_Is(t *testing.T) {
 	t.Parallel()
 	testCases := map[string]struct {
-		use    *errkit.Error
+		err    error
 		target error
 		same   bool
 	}{
-		"nil": {
-			use:    nil,
+		"nil target": {
+			err:    nil,
+			target: nil,
+			same:   true,
+		},
+		"nil pointer target": {
+			err:    nil,
+			target: (*errkit.Error)(nil),
+			same:   false,
+		},
+		"nil pointer err": {
+			err:    (*errkit.Error)(nil),
 			target: nil,
 			same:   false,
 		},
-		"nil pointer": {
-			use:    nil,
+		"nil pointers": {
+			err:    (*errkit.Error)(nil),
 			target: (*errkit.Error)(nil),
 			same:   true,
 		},
-		"nil target": {
-			use:    &errkit.Error{Cause: io.EOF, Message: "m", Detail: "d"},
+		"nil err not same": {
+			err:    nil,
+			target: &errkit.Error{Message: "m", Detail: "d"},
+			same:   false,
+		},
+		"nil target not same": {
+			err:    &errkit.Error{Message: "m", Detail: "d"},
 			target: nil,
 			same:   false,
 		},
-		"equal": {
-			use:    &errkit.Error{Message: "m", Detail: "d"},
+		"eof err not same": {
+			err:    io.EOF,
 			target: &errkit.Error{Message: "m", Detail: "d"},
-			same:   true,
+			same:   false,
 		},
-		"not equal": {
-			use:    &errkit.Error{Cause: io.EOF, Message: "m", Detail: "d"},
+		"eof target not same": {
+			err:    &errkit.Error{Message: "m", Detail: "d"},
 			target: io.EOF,
 			same:   false,
 		},
+		"equal": {
+			err:    &errkit.Error{Message: "m", Detail: "d"},
+			target: &errkit.Error{Message: "m", Detail: "d"},
+			same:   true,
+		},
 		"message mismatch": {
-			use:    &errkit.Error{Message: "m", Detail: "d"},
+			err:    &errkit.Error{Message: "m", Detail: "d"},
 			target: &errkit.Error{Message: "M", Detail: "d"},
 			same:   false,
 		},
 		"detail mismatch": {
-			use:    &errkit.Error{Message: "m", Detail: "d"},
-			target: &errkit.Error{Message: "m", Detail: "D"},
+			target: &errkit.Error{Message: "m", Detail: "d"},
+			err:    &errkit.Error{Message: "m", Detail: "D"},
 			same:   true,
 		},
-		"same after unwrap": {
-			use:    &errkit.Error{Message: "m", Detail: "d"},
-			target: fmt.Errorf("outer error [%w]", &errkit.Error{Message: "m", Detail: "d"}),
+		"same after unwrap error": {
+			err:    fmt.Errorf("outer error [%w]", &errkit.Error{Message: "m", Detail: "d"}),
+			target: &errkit.Error{Message: "m", Detail: "d"},
+			same:   true,
+		},
+		"same after unwrap errors": {
+			err:    fmt.Errorf("outer error [%w] [%w]", io.EOF, &errkit.Error{Message: "m", Detail: "d"}),
+			target: &errkit.Error{Message: "m", Detail: "d"},
 			same:   true,
 		},
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
-			is := tc.use.Is(tc.target)
-			tester.AssertEqual(t, tc.same, is)
+			tester.AssertEqual(t, tc.same, errors.Is(tc.err, tc.target))
 		})
 	}
 }
 
-func TestErr_Map(t *testing.T) {
+func TestError_Map(t *testing.T) {
 	t.Parallel()
 	t.Run("minimum", func(t *testing.T) {
 		e := &errkit.Error{Message: "m", Detail: "d"}
@@ -133,7 +158,7 @@ func TestErr_Map(t *testing.T) {
 	})
 }
 
-func TestErr_SlogAttrs(t *testing.T) {
+func TestError_SlogAttrs(t *testing.T) {
 	t.Parallel()
 	t.Run("minimum", func(t *testing.T) {
 		e := &errkit.Error{Message: "m", Detail: "d"}

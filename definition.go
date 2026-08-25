@@ -151,15 +151,9 @@ func (e *ErrInstance) Unwrap() error {
 // Is returns if this error is identical to the given error.
 // This can be used with [errors.Is].
 func (e *ErrInstance) Is(err error) bool {
-	if err == nil || e == nil {
-		return e == err
-	}
-	for err != nil {
-		ee, ok := err.(*ErrInstance)
-		if ok {
-			return e.Code == ee.Code && e.Kind == ee.Kind
-		}
-		err = errors.Unwrap(err)
+	ee, ok := err.(*ErrInstance)
+	if ok {
+		return e.Code == ee.Code && e.Kind == ee.Kind
 	}
 	return false
 }
